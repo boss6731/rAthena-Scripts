@@ -1,103 +1,102 @@
-//===== rAthena Script =======================================
-//= Security System - SQL
-//===== By ===================================================
+//===== rAthena 腳本 =======================================
+//= 安全系統 - SQL
+//===== 作者 ===================================================
 //= llchrisll
-//===== Version ==============================================
-//= 1.0 - Initial Version
-//= 1.1 - Fixed SQL Bug (SQL Injection) - Thanks to ToastofDoom
-//= 2.0 - Shortened a bit and made it more dynamically
-//      - Removed OnWhisperGlobal
-//      - Renamed variables (always temp character variables ....)
-//      - Added prevention to use "ALT+M" shortcuts and dying via 
-//        Attacks like Mob or PvP Maps after Login until the security password has been put
-//= 2.1 - Script Optimization
-//      - Removed Server Mode Selection - only SQL now
-//===== Tested With =========================================
-//= rAthena SQL 07/16-2017 Revision
-//===== Description ==========================================
-//= Security System - Simple
-//===== Comments =============================================
-//= None....
+//===== 版本 ==============================================
+//= 1.0 - 初始版本
+//= 1.1 - 修復了SQL錯誤（SQL注入）- 感謝ToastofDoom
+//= 2.0 - 簡化了一些內容並使其更具動態性
+//      - 刪除了OnWhisperGlobal
+//      - 重新命名變量（始終是臨時角色變量....）
+//      - 添加了在登錄後禁用“ALT+M”快捷鍵和通過攻擊（如怪物或PvP地圖）死亡的防止機制，直到安全密碼被輸入為止
+//= 2.1 - 腳本優化
+//      - 刪除了服務器模式選擇 - 現在只有SQL
+//===== 測試版本 =========================================
+//= rAthena SQL 07/16-2017 修訂版
+//===== 描述 ==========================================
+//= 安全系統 - 簡單
+//===== 註釋 =============================================
+//= 無....
 //============================================================
-prontera.gat,150,180,4	script	Security Manager	109,{
+prontera.gat,150,180,4	script	安全管理員	109,{
 
 if (getgmlevel() >= 80) {
 	mes .n$;
-	mes "Which Menu?";
-	if(select("- Player Menu:- GM Menu") - 1) goto M_GM;
+	mes "哪個菜單？";
+	if(select("- 玩家菜單:- GM菜單") - 1) goto M_GM;
 	next;
 }
 mes .n$;
-mes "Hello, "+strcharinfo(0)+".";
-mes "What do you wanna do?";
+mes "你好，"+strcharinfo(0)+"。";
+mes "你想做什麼？";
 next;
-if(select("- Add/Change my Password:- Nothing") - 1) close;
+if(select("- 添加/更改我的密碼:- 什麼也不做") - 1) close;
 
 if($security_pass == 0) {
 	set #security_pass, 0;
 	mes .n$;
-	mes "The System isn't enabled.";
+	mes "系統未啟用。";
 	close;
 
 } else if($security_pass == 1 && #security_pass == 0) {
 	mes .n$;
-	mes "Hello, "+strcharinfo(0)+"";
-	mes "So you want to set your Password?";
+	mes "你好，"+strcharinfo(0)+"";
+	mes "所以你想設置你的密碼？";
 	next;
-	if(select("- Yes, please:- Naa, not now.") - 1) {
+	if(select("- 是的，請:- 不，現在不要") - 1) {
 		mes .n$;
-		mes "Okay, please come back as soon as possible.";
+		mes "好的，請盡快回來。";
 		close;
 	}
 	mes .n$;
-	// In case the database has not been cleaned before the script has been removed, extra check....
+	// 如果在移除腳本之前數據庫未清理，則進行額外檢查....
 	query_sql "SELECT `pass` FROM `security_sys` WHERE `account_id` = '"+getcharid(3)+"'",.@sec_pass$;
 	if(.@sec_pass$ != "") {
-		mes "It seems like that the database hasn't been cleared before removing the script.";
-		mes "I will use your password from before, which is "+.@sec_pass$+".";
+		mes "看來在移除腳本之前數據庫未清理。";
+		mes "我將使用你之前的密碼，它是 "+.@sec_pass$+"。";
 		set #security_pass,1;
 		close;
 	}
-	mes "Okay, type the password you want.";
+	mes "好的，請輸入你想要的密碼。";
 	input .@sec_pass$;
 	next;
 	mes .n$;
-	mes "The Password is:";
+	mes "密碼是：";
 	mes .@sec_pass$;
-	mes "Is that correct?";
-	if(select("- Yes, it is:- No,repeat please") - 1) close;
+	mes "這正確嗎？";
+	if(select("- 是的，正確：不，請重複") - 1) close;
 	next;
 	set #security_pass, 1;
 	callfunc "SS_PW",2,3,.@sec_pass$;
 	mes .n$;
-	mes "Thank you for your time.";
-	mes "Your Password and IP got saved.";
-	mes "Remember it carefully.";
+	mes "感謝你的時間。";
+	mes "你的密碼和IP已保存。";
+	mes "請牢記。";
 	close;
 
 } else if($security_pass == 1 && #security_pass == 1) {
 	mes .n$;
-	mes "So you want to change your Password?";
-	if(select("- Yes:- No") - 1) close;
+	mes "所以你想更改你的密碼？";
+	if(select("- 是:- 不") - 1) close;
 	next;
 	mes .n$;
-	mes "Please insert the new Password.";
-	mes "^FF2200 Note: Type \"Cancel\" into the box to cancel your attempt.^000000";
+	mes "請輸入新密碼。";
+	mes "^FF2200 注意：在方框中輸入“取消”以取消你的操作。^000000";
 	next;
 	input .@ch_pass$;
 	mes .n$;
-	if(.@ch_pass$ == "Cancel") close;
+	if(.@ch_pass$ == "取消") close;
 	if( callfunc("SS_PW",1,1,.@ch_pass$) == 1) {
-		mes "I'm sorry, but the new Password matches the previous one.";
+		mes "抱歉，但新密碼與以前的密碼相匹配。";
 		close;
 	}
-	mes "The new password is:";
+	mes "新密碼是：";
 	mes .@ch_pass$;
-	mes "Is that correct?";
-	if(select("- Yes, it is correct:- No, I don't want to change it.") - 1) close;
+	mes "這正確嗎？";
+	if(select("- 是，正確：不，我不想更改它。") - 1) close;
 	next;
 	mes .n$;
-	mes "Thank you for your time.";
+	mes "謝謝你的時間。";
 	callfunc("SS_PW",2,1,.@ch_pass$);
 	close;
 }
@@ -106,30 +105,30 @@ M_GM:
 next;
 if($sec_table_created == 1) {
 	mes .n$;
-	mes "Hello, "+strcharinfo(0)+"!";
-	mes "What do you want to do?";
+	mes "你好，"+strcharinfo(0)+"！";
+	mes "你想做什麼？";
 	next;
-	switch(select("- Disable/Enable the System:- Delete Table:- Nothing") ) {
+	switch(select("- 禁用/啟用系統:- 刪除表格:- 什麼也不做") ) {
 
 		case 1:
 		mes .n$;
-		mes "The Security System is " + ( ($security_pass) ? "^00BB22Enabled^000000." : "^FF2200Disabled^000000.");
-		mes "Do you want to "+ ( ($security_pass == 0)?"enable":"disable")+" it?";
-		if(select("- Yes, please:- No, thanks") - 1) close;
+		mes "安全系統"+ ( ($security_pass) ? "^00BB22已啟用^000000。" : "^FF2200已禁用^000000。");
+		mes "你想"+ ( ($security_pass == 0)?"啟用":"禁用")+"它嗎？";
+		if(select("- 是，請:- 不，謝謝") - 1) close;
 		next;
 		mes .n$;
-		mes "The Security System is "+ ( ($security_pass == 0)?"enabled":"disabled")+" now.";
-		announce "The Security Systen has been "+ ( ($security_pass == 0)?"enabled":"disabled")+".",bc_yellow|bc_all;
+		mes "安全系統現在"+ ( ($security_pass == 0)?"已啟用":"已禁用")+"。";
+		announce "安全系統已"+ ( ($security_pass == 0)?"啟用":"禁用")+"。",bc_yellow|bc_all;
 		set $security_pass,!$security_pass;
 		close;
 
 		case 2:
 		mes .n$;
-		mes "Do you really want to delete the whole table?";
-		if(select("- Yes, I want!!:- No, I misclicked ya") - 1) close;
+		mes "你真的要刪除整個表格嗎？";
+		if(select("- 是，我要！！:- 不，我點錯了") - 1) close;
 		next;
 		mes .n$;
-		mes "Okay, it's a 'One-Way Ticket'!!!!";
+		mes "好的，這是'單程票'!!!!";
 		query_sql "DROP TABLE `security_sys`";
 		set $sec_table_created,0;
 		set $security_pass,0;
@@ -137,18 +136,18 @@ if($sec_table_created == 1) {
 
 		case 3:
 		mes .n$;
-		mes "Goodbye, see ya next time.";
+		mes "再見，下次見。";
 		close;
 	}
 	
 } else {
 	mes .n$;
-	mes "There isn't a table in your database yet.";
-	mes "Want to create it?";
-	if(select("- Yes, I want to create one:- No, don't wanna") - 1) close;
+	mes "你的數據庫中還沒有表格。";
+	mes "想創建一個嗎？";
+	if(select("- 是，我想創建一個:- 不，不想") - 1) close;
 	next;
 	mes .n$;
-	mes "The Table is created now.";
+	mes "表格現在已創建。";
 	query_sql "CREATE TABLE IF NOT EXISTS `security_sys` ( `last_ip` VARCHAR( 100 ) , `account_id` INT( 11 ) , `pass` VARCHAR( 32 ))";
 	set $sec_table_created, 1;
 	set $security_pass, 1;
@@ -156,7 +155,7 @@ if($sec_table_created == 1) {
 }
 
 OnInit:
-set .n$,"[Security Manager]";
+set .n$,"[安全管理員]";
 if(query_sql("SHOW TABLES LIKE 'security_sys'",.@tbl) != 0)
 	set $sec_table_created,1;
 end;
@@ -166,43 +165,43 @@ end;
 end;
 
 OnPCLoginEvent:
-set .@n$,"[Security Manager]";
-// Server Name
-set .@serv_name$,"<Server Name>";
-// Mail Address
-set .@serv_mail$,"<Server Mail Address>";
-// ========== System is offline =======
+set .@n$,"[安全管理員]";
+// 服務器名稱
+set .@serv_name$,"<服務器名稱>";
+// 郵件地址
+set .@serv_mail$,"<服務器郵件地址>";
+// ========== 系統離線 =======
 if($security_pass == 0) {
-	// Either Password has not been set or the system was temporarly down
+	// 密碼未設置或系統暫時關閉
 	if(#security_pass == 0 || #security_pass == 3) end;
-	// Password is set but system offline
+	// 密碼已設置但系統離線
 	else if(#security_pass == 1) { 
-		announce "The Security System is momentally offline.",bc_red|bc_self;
+		announce "安全系統暫時離線。",bc_red|bc_self;
 		set #security_pass,3;
-	// System Offline but Jail active	
+	// 系統離線但監獄活動	
 	} else if(#security_pass == 2) 
 		set #security_pass,0;
 
-// ============= System is online =============
+// ============= 系統在線 =============
 } else if($security_pass == 1) {
-	// No Password set yet
+	// 尚未設置密碼
 	if(#security_pass == 0) {
 		mes .@n$;
-		mes "Your Security Password hasn't been set yet.";
-		mes "Please come to me and set it.";
+		mes "你的安全密碼尚未設置。";
+		mes "請來找我設置。";
 		close;
 	
-	// Jail.....
+	// 監獄.....
 	} else if(#security_pass == 2) {
-		sc_start 112,999999,1; //Berserk State, not able to talk/using commands
-		pcblockmove getcharid(3),1; // Preventing from moving
+		sc_start 112,999999,1; //狂暴狀態，無法交談/使用命令
+		pcblockmove getcharid(3),1; // 防止移動
 
 		mes .@n$;
-		mes "Please type the 'correct' Password now or your account will be blocked";
-		mes "and you have to write an e-mail to \""+.@serv_mail$+"\" with the content of the right Password.";
+		mes "請現在輸入'正確'的密碼，否則你的帳戶將被封鎖";
+		mes "並且你必須寫一封郵件給 \""+.@serv_mail$+"\"，內容是正確的密碼。";
 		next;
 		mes .@n$;
-		mes "Start please:";
+		mes "請開始：";
 		next;
 		input .@pass$;
 		if( callfunc("SS_PW",1,1,.@pass$) == 1 ) {
@@ -214,42 +213,41 @@ if($security_pass == 0) {
 			goto PW_PASS;
 		}
 		mes .@n$;
-		mes "The Password you typed is wrong.";
-		mes "Your Account will be blocked now.";
+		mes "你輸入的密碼錯誤。";
+		mes "你的帳戶現在將被封鎖。";
 		close2;
 		atcommand "@block "+strcharinfo(0);
 		end;
 	
-	// System was temporarly offline
+	// 系統暫時離線
 	} else if(#security_pass == 3) {
-		announce "The Security System is back online.",bc_red|bc_self;
+		announce "安全系統已恢復線上。",bc_red|bc_self;
 		set #security_pass,1;
 		
-	// Password was set
-	} else if(#security_pass == 1) { // Check if Password was set
-		if( callfunc("SS_PW",1,2) == 1) goto PW_PASS; // IP Check
+	// 密碼已設置
+	} else if(#security_pass == 1) { // 檢查是否設置了密碼
+		if( callfunc("SS_PW",1,2) == 1) goto PW_PASS; // IP 檢查
 		
-		sc_start 112,999999,1; //Berserk State, not able to talk/using commands
-		pcblockmove getcharid(3),1; // Preventing from moving
-		atcommand "@battleignore"; // Preventing the player from dying from attacks
+		sc_start 112,999999,1; //狂暴狀態，無法交談/使用命令
+		pcblockmove getcharid(3),1; // 防止移動
+		atcommand "@battleignore"; // 防止玩家因攻擊而死亡
 		set @lock,1;
 		
 		mes .@n$;
-		mes "Please insert the Password for your own Security.";
+		mes "請輸入用於自己安全的密碼。";
 		next;
 		input .@pass$;
-		if( callfunc("SS_PW",1,1,.@pass$) == 1) goto PW_PASS; // Inserted Password Check
+		if( callfunc("SS_PW",1,1,.@pass$) == 1) goto PW_PASS; // 插入密碼檢查
 		mes .@n$;
-		mes "The Password you typed is wrong.";
-		mes "You got one more chance to login.";
+		mes "你輸入的密碼錯誤。";
+		mes "你有一次機會登錄。";
 		next;
 		input .@pass$;
 		if( callfunc("SS_PW",1,1,.@pass$) == 1) goto PW_PASS;
 		mes .@n$;
-		mes "You typed the Password wrong twice.";
-		mes "You will be warped to the Jail now.";
-		mes "After Login in, you have to write the password again and if you are write it";
-		mes "again wrong your account will be blocked.";
+		mes "你兩次輸入的密碼錯誤。";
+		mes "你將被傳送到監獄。";
+		mes "登錄後，你必須再次輸入密碼，如果再次錯誤，你的帳戶將被封鎖。";
 		close2;
 		atcommand "@jail "+strcharinfo(0);
 		set #security_pass,2;
@@ -263,11 +261,11 @@ if($security_pass == 0) {
 }
 end;
 
-// Password Input Passed
+// 密碼輸入通過
 PW_PASS:
 mes .@n$;
-mes "You have successfully logged in. Have Fun on "+.@serv_name$+".";
-// Checking if the player has a different IP then before and update it accordingly.
+mes "你已成功登錄。在 "+.@serv_name$+" 上玩得開心。";
+// 檢查玩家是否與以前的IP不同，並相應地更新它。
 if(@ip_n) {
 	callfunc("SS_PW",2,2,@ip_new$);
 	set @ip_n,0;
@@ -284,39 +282,39 @@ end;
 }
 
 function	script	SS_PW	{
-// getarg(0) == Data Type
-//   - 1= Read
-//   - 2= Write
-// getarg(1) == Read/Write Type
-//   - 1=PW
+// getarg(0) == 數據類型
+//   - 1= 讀取
+//   - 2= 寫入
+// getarg(1) == 讀/寫類型
+//   - 1=密碼
 //   - 2=IP
-//   - 3=New Entry
-// getarg(2) == Data Value
+//   - 3=新條目
+// getarg(2) == 數據值
 	switch(getarg(1)) {
 		case 1: 
-		if(getarg(0) == 1) { // Data Type - Read
+		if(getarg(0) == 1) { // 數據類型 - 讀取
 			query_sql "SELECT `pass` FROM `security_sys` WHERE `account_id` = '"+getcharid(3)+"'",.@sec_pass$;
 			if(getarg(2) == .@sec_pass$) return 1;
 			else return -1;
 		
-		} else if(getarg(0) == 2) // Data Type - Write
+		} else if(getarg(0) == 2) // 數據類型 - 寫入
 			query_sql "UPDATE `security_sys` SET `pass` = '"+escape_sql(getarg(3))+"' WHERE `account_id` = '"+getcharid(3)+"'";
 		
 		return;
 		
 		case 2:
-		// checks the IP's
-		if(getarg(0) == 1) { // Data Type - Read
+		// 檢查IP
+		if(getarg(0) == 1) { // 數據類型 - 讀取
 			query_sql "SELECT `last_ip` FROM `login` WHERE `account_id` = '"+getcharid(3)+"'",.@last_ip$;
 			query_sql "SELECT `last_ip` FROM `security_sys` WHERE `account_id` = '"+getcharid(3)+"'",.@last_ip2$;
 			if(.@last_ip$ == .@last_ip2$) return 1;
 			else { 
-				set @ip_n,1; // Got new IP > Update after Password Check passed
-				set @ip_new$,.@last_ip$; // IP Itself
+				set @ip_n,1; // 獲取新IP > 在密碼檢查通過後更新
+				set @ip_new$,.@last_ip$; // IP 本身
 				return -1;
 			}
 			
-		} else if(getarg(0) == 2) // Data Type - Write
+		} else if(getarg(0) == 2) // 數據類型 - 寫入
 			query_sql "UPDATE `security_sys` SET `last_ip` = '"+getarg(3)+"' WHERE `account_id` = '"+getcharid(3)+"'";
 		
 		case 3:
