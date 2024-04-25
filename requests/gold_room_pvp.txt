@@ -1,5 +1,6 @@
+
 //===== rAthena Script =======================================
-//= Gold Room Battle
+//= Gold Room Battle			GPT 翻譯 繁體中文 ====
 //===== By ===================================================
 //= llchrisll
 //===== Version ==============================================
@@ -19,50 +20,50 @@
 //  http://rathena.org/board/topic/59504-list-of-my-script-request/
 //============================================================
 prontera,164,172,4	script	Gold Room Battle	100,{
-
+// 哈囉，玩家名稱。你需要什麼幫助？
 mes .n$;
-mes "Hello,"+ strcharinfo(0)+".";
-mes "How may I help you?";
+mes "你好，"+ strcharinfo(0)+ "。";
+mes "你需要什麼樣的幫助呢？";
 if(getgmlevel() > .gm) 
-	if(select("- GM Menu:- Player Menu") - 2) goto GM_M;
-mes "Do you need information about the access to the Gold Room or about the Gold Room Battle?";
-if(.timer == .delay) mes "Or do you want to participate?";
-mes "The next battle will be in "+ (.delay-.timer) +" day(s).";
+	if(select("- GM 選單:- 玩家選單") - 2) goto GM_M;
+mes "你想要了解關於進入黃金房間的資訊，還是關於黃金房間戰鬥的資訊？";
+if(.timer == .delay) mes "或者你想參加戰鬥嗎？";
+mes "下一場戰鬥將在 "+ (.delay-.timer) +" 天後舉行。";
 next;
-switch(select("- "+( ($gold_acc == getcharid(3))?"Warp to Gold Room":"Ownership")+":- "+( (.GRB_Room == 1)?"Battle!!!":"Room Closed")+":- Information:- Nevermind") ) {
+switch(select("- "+( ($gold_acc == getcharid(3))?"傳送到黃金房間":"所有權")+":- "+( (.GRB_Room == 1)?"開始戰鬥":"房間已關閉")+":- 資訊:- 沒事了") ) {
 	
 	case 1:
 	mes .n$;
 	if($gold_acc && ($gold_acc == getcharid(3)) ) {
-		mes "Do you want to enter the Gold Room?";
-		mes "^FF0000Note: You'll be automatically warped back to your Save Point after "+.dur+" minutes.^000000";
-		if(select("- Yes:- No") - 1) close;
+		mes "你想進入黃金房間嗎？";
+		mes "^FF0000注意：在 "+.dur+" 分鐘後，你將被自動傳送回你的儲存點。^000000";
+		if(select("- 是的:- 不") - 1) close;
 		next;
 		mes .n$;
-		mes "Okay, here we go.";
+		mes "好的，我們開始吧。";
 		close2;
 		warp .gold$,.gold_x,.gold_y;
-		sleep2( .dur*60*1000 ); // Minutes*60 > Seconds*1000 = Milliseconds required for sleep2
+		sleep2( .dur*60*1000 ); // 分鐘*60 > 秒*1000 = sleep2所需的毫秒數
 		doevent strnpcinfo(0)+"::OnDone";
 	} else if($gold_acc != getcharid(3))
-		mes "The current owner is ^00FF00"+$gold_n$+"^000000.";
+		mes "目前的所有者是 ^00FF00"+$gold_n$+"^000000。";
 	break;
 	
 	case 2:
 	mes .n$;
 	if(!.GRB_Room) {
-		mes "I'm sorry, but the battle isn't open yet.";
+		mes "對不起，但戰鬥尚未開放。";
 		close;
 	}
 	if(getmapusers(.pvp$) >= .limit) {
-		mes "I'm sorry, but the limit of "+.limit+" player has been reached.";
+		mes "對不起，已達到 "+.limit+" 人的上限。";
 		close;
 	}
-	mes "Do you want to join the Gold Room Battle?";
-	if(select("- Yes:- No") - 1) close;
+	mes "你要加入黃金房間戰鬥嗎？";
+	if(select("- 是的:- 不") - 1) close;
 	next;
 	mes .n$;
-	mes "I will warp you now to the battlefield.";
+	mes "我現在將你傳送到戰場。";
 	close2;
 	warp .pvp$,0,0;
 	set @gold,1;
@@ -72,15 +73,15 @@ switch(select("- "+( ($gold_acc == getcharid(3))?"Warp to Gold Room":"Ownership"
 	
 	case 3:
 	mes .n$;
-	mes "[ === Battle === ]";
-	mes "The Gold Room Battle is, like the name says, an pvp-type event where the last one to survive will be rewarded with access to his/her own Gold Room until the next battle.";
-	mes "The whole event has a max duration of "+.min+" minutes.";
-	mes "There can up to "+.limit+" players to battle with an registration time of 3 minutes.";
-	mes "The next battle is in "+.delay +" days after the last one.";
+	mes "[ === 戰鬥 === ]";
+	mes "黃金房間戰鬥，正如其名，是一種 PvP 類型的活動，最後倖存者將獲得自己的黃金房間存取權，直到下一場戰鬥結束。";
+	mes "整個活動的最長持續時間為 "+.min+" 分鐘。";
+	mes "最多可容納 "+.limit+" 名玩家參加，報名時間為 3 分鐘。";
+	mes "下一場戰鬥將在 "+.delay +" 天後舉行。";
 	mes " ";
-	mes "[ === Gold Room === ]";
-	mes "The winner of an battle can visit his/her gold room in this "+.delay+" days for "+.dur+" minutes and always.";
-	mes "That means there are no restrictions in usage.";
+	mes "[ === 黃金房間 === ]";
+	mes "戰鬥的勝利者可以在接下來的 "+.delay+" 天內以 "+.dur+" 分鐘的時間造訪他/她的黃金房間，沒有使用上的限制。";
+	mes "這意味著沒有使用上的限制。";
 	break;
 	
 	case 4:
@@ -91,13 +92,13 @@ end;
 GM_M:
 next;
 mes .n$;
-mes "What now?";
-if(select("- Start/Stop Event:- Nevermind") - 1) close;
+mes "現在該怎麼辦？";
+if(select("- 開始/停止活動:- 沒事了") - 1) close;
 next;
 if(.GRB_Eve) doevent strnpcinfo(0)+"::OnDisable"; 
 else doevent strnpcinfo(0)+"::OnPrepare";
 mes .n$;
-mes "The event has turned "+ ( (.GRB_Eve)?"off":"on")+".";
+mes "活動已經 "+ ( (.GRB_Eve)?"關閉":"開啟")+"。";
 close;
 
 OnPCLogoutEvent:
@@ -109,7 +110,7 @@ end;
 
 OnPCLoadMapEvent:
 if( (strcharinfo(3) == .pvp$ && !@gold) || (strcharinfo(3) == .gold$ && getcharid(3) != $gold_acc) ) {
-	dispbottom .n$+": I'll warp you back to your savepoint because either you tried to join the battle, though you didn't register first or you tried to visit the gold room of another player.";
+	dispbottom .n$+": 由於你嘗試加入戰鬥但沒有事先註冊，或者你試圖造訪其他玩家的黃金房間，我將把你傳送回儲存點。";
 	warp "SavePoint",0,0;
 	end;
 }
@@ -126,15 +127,15 @@ OnMinute00:
 set .timer,.timer + 1;
 if( (.timer/60)/24 >= .delay) {
 	if(getmapusers(.pvp$) > 0) {
-		mapannounce .pvp$,.n$+": I will warp you all back to prontera, because I need this map for the Gold Room Battle.",bc_all;
+		mapannounce .pvp$,.n$+": 我將把你們全部傳送回普隆德拉，因為我需要這張地圖來進行黃金房間戰鬥。",bc_all;
 		sleep 5000;
 		mapwarp .pvp$,"prontera",150,180;
 	}
 	set .timer,0;
 	set $gold_acc,0;
-	announce .n$+": The gold room battle will begin shortly!!!",bc_all;
+	announce .n$+": 黃金房間戰鬥即將開始！！！",bc_all;
 	sleep 10000;
-	announce .n$+": You have 3 minutes to register, which starts now!!!",bc_all;
+	announce .n$+": 你有 3 分鐘的時間進行報名，現在開始計時！！！",bc_all;
 	initnpctimer;
 	set .GRB_Eve,1;
 	set .GRB_Room,1;
@@ -147,25 +148,25 @@ if( (.timer/60)/24 >= .delay) {
 		pvpoff .pvp$;
 	}
 	while(.GRB_Room) {
-		waitingroom "Current Fighters: "+getmapusers(.pvp$),0;
+		waitingroom "當前參戰者: "+getmapusers(.pvp$),0;
 		sleep 2000;
 		delwaitingroom;
 	}
 }
 end;
 
-OnTimer120000: // 2 Minutes
-announce .n$+": Hurry guys, 1 minute left!!!!",bc_all;
+OnTimer120000: // 2 分鐘
+announce .n$+": 快點，還剩 1 分鐘！！！",bc_all;
 end;
 
-Ontimer180000: // 3 Minutes
+Ontimer180000: // 3 分鐘
 OnBattleStart:
 stopnpctimer;
 set .GRB_Room,0;
-announce .n$+": Registration closed, let's see how many have registered....",bc_all;
+announce .n$+": 報名已截止，讓我們看看有多少人報名....",bc_all;
 sleep 10000;
 if(getmapusers(.pvp$) < 2) {
-	announce .n$+": It seems like there are not enough players to start the battle.",bc_all;
+	announce .n$+": 看來參加者不夠，無法開始戰鬥。",bc_all;
 	goto OnDisable;
 }
 setmapflag .pvp$,mf_noreturn;
@@ -178,41 +179,41 @@ setmapflag .pvp$,mf_partylock;
 setmapflag .pvp$,mf_pvp_noparty;
 setmapflag .pvp$,mf_pvp_noguild;
 setmapflag .pvp$,mf_loadevent;
-announce .n$+": There are "+getmapusers(.pvp$)+" players registered.",bc_all;
+announce .n$+": 有 "+getmapusers(.pvp$)+" 名玩家報名參加。",bc_all;
 sleep 5000;
-announce .n$+": I will start the battle in 10 seconds!! Particpants, prepare yourself!! I also wish you good luck all!!",bc_all;
+announce .n$+": 我將在 10 秒內開始戰鬥！！參戰者，準備好了嗎！！祝大家好運！！",bc_all;
 sleep 5000;
-mapannounce .pvp$,.n$+": 5 seconds left!!!",bc_all;
+mapannounce .pvp$,.n$+": 還剩 5 秒！！！",bc_all;
 sleep 1000;
-mapannounce .pvp$,.n$+": 4 seconds left!!!",bc_all;
+mapannounce .pvp$,.n$+": 還剩 4 秒！！！",bc_all;
 sleep 1000;
-mapannounce .pvp$,.n$+": 3 seconds left!!!",bc_all;
+mapannounce .pvp$,.n$+": 還剩 3 秒！！！",bc_all;
 sleep 1000;
-mapannounce .pvp$,.n$+": 2 seconds left!!!",bc_all;
+mapannounce .pvp$,.n$+": 還剩 2 秒！！！",bc_all;
 sleep 1000;
-mapannounce .pvp$,.n$+": 1 seconds left!!!",bc_all;
+mapannounce .pvp$,.n$+": 還剩 1 秒！！！",bc_all;
 sleep 1000;
-mapannounce .pvp$,.n$+": GO !!!!",bc_all;
+mapannounce .pvp$,.n$+": 開始！！！",bc_all;
 pvpon .pvp$;
 startnpctimer;
 set .t_ck,0; // Timer Check
 end;
 
-OnTimer360000: // 3 Min = 180 seconds (Registration Time) + each min = 60 seconds > 360000 milliseconds
+OnTimer360000: // 3 分鐘 = 180 秒（報名時間）+ 每分鐘 = 60 秒 > 360000 毫秒
 stopnpctimer;
 set .t_ck,.t_ck + 1;
 if(.t_ck == .min/2) {
-	mapannounce .pvp$,.n$+": "+.min/2+" minutes have passed!!",bc_all;
+	mapannounce .pvp$,.n$+": "+.min/2+" 分鐘過去了！！",bc_all;
 	if(getmapusers(.pvp$) == 0) {
 		sleep 10000;
-		mapannounce .pvp$,.n$+": Huh?! Where did the players disappear to? Since there are none, I will end the battle.",bc_all;
+		mapannounce .pvp$,.n$+": 哎呀！玩家都去哪了？既然沒有玩家了，我會結束戰鬥。",bc_all;
 		goto OnDisable;
 	}
 } else if(.t_ck == .min) {
-	mapannounce .pvp$,.n$+": "+.min+" minutes have passed!! Since no one has won this battle, I will end this battle!!",bc_all;
+	mapannounce .pvp$,.n$+": "+.min+" 分鐘過去了！！由於沒有人贏得這場戰鬥，我將結束這場戰鬥！！",bc_all;
 	goto OnDisable;
 }
-setnpctimer 180100; // Reseting the timer back to after the registration time has passed
+setnpctimer 180100; // 重置計時器至報名時間過後
 startnpctimer;
 end;
 
@@ -235,8 +236,8 @@ if(.gvg) {
 }
 if(!.pvp) pvpoff .pvp$;
 else set .pvp,0;
-announce .n$+": The event, Gold Room Battle, has ended!!!",bc_all;
-mapannounce .pvp$,.n$+": You all will be warped in 10 seconds back to prontera.",bc_all;
+announce .n$+": 黃金房間戰鬥活動已結束！！",bc_all;
+mapannounce .pvp$,.n$+": 你們將在 10 秒內被傳送回普隆德拉。",bc_all;
 sleep 10000;
 mapwarp .pvp$,"prontera.gat",150,180;
 set .GRB_Eve,0;
@@ -244,38 +245,38 @@ end;
 
 OnPCKillEvent:
 if(strcharinfo(3) != .pvp$ || !@gold ) end;
-mapannounce .pvp$,.n$+": "+strcharinfo(0)+" has killed "+rid2name(killedrid)+"!!",bc_all;
+mapannounce .pvp$,.n$+": "+strcharinfo(0)+" 擊敗了 "+rid2name(killedrid)+"！！",bc_all;
 end;
 
 OnPCDieEvent:
 if(strcharinfo(3) != .pvp$ || !@gold ) end;
 set @gold,0;
 warp "SavePoint",0,0;
-sleep2 1500; // Slowing down the script
+sleep2 1500; // 減慢腳本速度
 percentheal 100,100;
-if(killerrid != getcharid(3)) dispbottom .n$+": You have been killed by "+rid2name(killerrid)+"!!";
-if(getmapusers(.pvp$) == 2) mapannounce .pvp$,.n$+": Wuhu!! Only 2 players remain, let's see who is the better player!!",bc_all;
+if(killerrid != getcharid(3)) dispbottom .n$+": 你被 "+rid2name(killerrid)+" 擊敗了！！";
+if(getmapusers(.pvp$) == 2) mapannounce .pvp$,.n$+": 嗚呼！！只剩下 2 名玩家，讓我們看看誰是更強的玩家！！",bc_all;
 else if(getmapusers(.pvp$) == 1) {
-	announce .n$+": The winner of the Gold Room Battle is "+ rid2name(killerrid)+".",bc_all;
-	set $gold_acc,killerrid; // Saving RID of the winner
+	announce .n$+": 黃金房間戰鬥的勝利者是 "+ rid2name(killerrid)+ "。",bc_all;
+	set $gold_acc,killerrid; // 儲存勝利者的 RID
 	set $gold_n$,rid2name($gold_acc);
 	detachrid;
-	if(attachrid($gold_acc) == 1) dispbottom .n$+": You have won the Gold Room Battle, if you want to enter your Gold Room, please talk to me.";
+	if(attachrid($gold_acc) == 1) dispbottom .n$+": 你贏得了黃金房間戰鬥，如果你想進入你的黃金房間，請與我對話。";
 	donpcevent strnpcinfo(0)+"::OnDisable";
 } else if(getmapusers(.pvp$) == 0) donpcevent strnpcinfo(0)+"::OnDisable";
 end;
 
 
 OnInit:
-set .n$,"["+strnpcinfo(1)+"]"; // NPC Name
-set .limit,10; // Max Players
-set .min,15; // Battle Duration
-set .pvp$,"guild_vs5"; // Map for the PvP Room
-set .gold$,"new_zone04"; // Map for the Gold Room
-set .gold_x,100; // X Coordinate for the Gold Room where to be warped to
-set .gold_y,181; // Y Coordinate for the Gold Room where to be warped to
-// If the PvP Map is not the same as the Gold Room Map,
-// use special mapflags and sets variable to disinguish
+set .n$,"["+strnpcinfo(1)+"]"; // NPC 名稱
+set .limit,10; // 最大玩家數量
+set .min,15; // 戰鬥持續時間
+set .pvp$,"guild_vs5"; // PvP 房間地圖
+set .gold$,"new_zone04"; // 黃金房間地圖
+set .gold_x,100; // 傳送至黃金房間的 X 座標
+set .gold_y,181; // 傳送至黃金房間的 Y 座標
+// 如果 PvP 地圖不同於黃金房間地圖，
+// 使用特殊的地圖標誌並設置變數以區分
 set .diff,0;
 if(.pvp$ != .gold$) { 
 	setmapflag .gold$,mf_noreturn;
@@ -287,7 +288,7 @@ if(.pvp$ != .gold$) {
 	setmapflag .gold$,mf_loadevent;
 	set .diff,1;
 }
-set .delay,2; // Delay in days in which interval the battle will be hold.
-set .dur,1;// Gold Room Visit in minutes
+set .delay,2; // 戰鬥之間的延遲天數。
+set .dur,1;// 訪問黃金房間的時間（分鐘）
 end;
 }
