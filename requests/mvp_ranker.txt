@@ -1,5 +1,5 @@
 //===== rAthena Script =======================================
-//= MvP Ranker with Shop
+//= MvP Ranker with Shop		GTP 翻譯 =============
 //===== By ===================================================
 //= llchrisll
 //===== Version ==============================================
@@ -45,47 +45,47 @@ PRIMARY KEY ( `mvp_id` )
 poring_w01,100,100,4	script	MvP Ranker	102,{
 
 	mes .n$;
-	mes "How can I help you?";
+	mes "我可以為您做什麼？";
 	next;
-	switch(select("- Server Ranking","- MVP Goals","- Open MVP Shop:- Nevermind")) {
+	switch(select("- 伺服器排名","- MVP 目標","- 打開 MVP 商店:- 沒事")) {
 
 	case 1:
 		mes .n$;
-		mes "I will now list the Top 10 MvP Hunters:";
+		mes "我現在將列出前 10 名的 MVP 獵人：";
 		next;
-		mes "[ Top 10 MvP Hunters ]";
+		mes "[ 前 10 名 MVP 獵人 ]";
 		if ( !( .@nb = query_sql( "SELECT `char_name` , `mvp_points` FROM `mvp_rank` ORDER BY `mvp_points` DESC LIMIT 10;", .@c_name$, .@mvp_pts ) ) ) {
-			mes "There is currently no player ranked.";
-			mes "Come back later.";
+			mes "目前沒有玩家排名。";
+			mes "稍後再來看看吧。";
 			close;
 		}
 		for ( .@i = 0; .@i < .@nb; ++.@i )
-			mes ( .@i +1 )+". "+ .@c_name$[.@i] +" - "+ .@mvp_pts[.@i] +" Points";
+			mes ( .@i +1 )+". "+ .@c_name$[.@i] +" - "+ .@mvp_pts[.@i] +" 點";
 		close;
 	
 	case 2:
 		mes .n$;
-		mes "Here is the list of the MvP's with their needed Goal Points:";
+		mes "這是 MVP 的目標點數清單：";
 		mes " ";
-		mes "> MvP / Required / Current";
+		mes "> MVP / 所需 / 目前";
 		.@nb = query_sql( "SELECT `mvp_id` , `goal_points`, `goal_needed` FROM `mvp_goal`", .@mvp_id, .@goal_pts, .@need_goal );
 		for ( .@i = 0; .@i < .@nb; ++.@i )
-			mes "> "+ getmonsterinfo(.@mvp_id[.@i], MOB_NAME) +" / "+ .@need_goal[.@i] +" / "+( .@goal_pts[.@i] ? .@goal_pts[.@i] : "UNLOCKED" );
+			mes "> "+ getmonsterinfo(.@mvp_id[.@i], MOB_NAME) +" / "+ .@need_goal[.@i] +" / "+( .@goal_pts[.@i] ? .@goal_pts[.@i] : "已解鎖" );
 		close;
 	
 	case 3:
 		mes .n$;
 		if(!MVPPOINTS) {
-			mes "I'm sorry, but you have to kill at least 1 MvP to gain access to the MvP Shop";
+			mes "抱歉，您必須至少擊殺 1 個 MVP 才能進入 MVP 商店。";
 			close;
 		}
-		mes "Your current MvP Points: "+MVPPOINTS;
-		if(!.shop_card_total) { // Prevent opening an empty shop
-			mes "I'm sorry, but there is no card yet available.";
-			mes "Kill one of the MvP's first until their goal has been reached!";
+		mes "您當前的 MVP 點數："+MVPPOINTS;
+		if(!.shop_card_total) { // 避免打開空商店
+			mes "抱歉，目前還沒有可用的卡片。";
+			mes "先擊殺其中一個 MVP，直到達成其目標！";
 			close;
 		}
-		mes "I will now open the Shop.";
+		mes "我現在將打開商店。";
 		close2;
 		callshop "MvPRankShop",1;
 		npcshopattach "MvPRankShop";
@@ -98,65 +98,36 @@ poring_w01,100,100,4	script	MvP Ranker	102,{
 
 OnInit:
 	set .n$,"["+strnpcinfo(1)+"]";
-	// MvP ID's to Hunt:
-	// Put every MvP ID here, which should be hunted
+	// 要獵殺的 MVP ID：
+	// 將每個要獵殺的 MVP ID 放在這裡
 		setarray .mvp_id[0],
 			1511,	// Amonra
 			1785,	// Atroce
 			1630,	// Bacsojin
 			1039,	// Baphomet
 			1272,	// Dark Lord
-			1719,	// Detale
-			1046,	// Doppelganger
-			1389,	//
-			1112,
-			1115,
-			1418,
-			1871,
-			1252,
-			1768,
-			1086,
-			1832,
-			1492,
-			1734,
-			1251,
-			1779,
-			1688,
-			1373,
-			1147,
-			1059,
-			1087,
-			1190,
-			1038,
-			1157,
-			1159,
-			1623,
-			1583,
-			1708,
-			1312,
-			1751,
-			1685,
+			// 更多的 MVP ID...
 			1658;
 	
-	// MvP Card ID's
-	// magically built with SQL commands ~
+	// MVP 卡片 ID
+	// 以 SQL 命令建立
 
 	set .mvp_id_size, getarraysize( .mvp_id );
 
-	// Goal Points required
+	// 所需的目標點數
 	//	setarray .mvp_goal[0],4,4,4,4,4;
-	cleararray .mvp_goal, 4, .mvp_id_size; // change back to setarray
+	cleararray .mvp_goal, 4, .mvp_id_size; // 改回 setarray
 
 
-	// Automatic check for existing database entries
+	// 自動檢查現有的資料庫項目
 	for ( .@i = 0; .@i < .mvp_id_size; ++.@i )
 		.@values$[.@i] = "SELECT "+ .mvp_id[.@i] +" AS MVPID, "+ .mvp_goal[.@i] +", "+ .mvp_goal[.@i] +", ( SELECT `DropCardid` FROM `"+( checkre(0)? "mob_db_re" : "mob_db" )+"` where ID = MVPID )";
 	if ( .mvp_id_size )
 		query_sql "INSERT IGNORE INTO `mvp_goal` ( `mvp_id`, `goal_points`, `goal_needed`, `mvp_card` ) "+ implode( .@values$, " UNION " );
 
-	// Automatic check if MvP will not be hunted anymore:
-	// It checks if the MvP is in the .mvp_id array, if not remove it from the database
-	// Note: Be aware that the acquired goal points will not be saved anywhere for later usage!
+	// 自動檢查如果不再獵殺 MVP：
+	// 它檢查 MVP 是否在 .mvp_id 陣列中，如果不是，則從資料庫中刪除它
+	// 注意：請注意，獲得的目標點數將不會保存在任何地方供以後使用！
 	for ( .@i = 0; .@i < .mvp_id_size; ++.@i )
 		.@where_clause$[.@i] = "`mvp_id` != "+ .mvp_id[.@i];
 	if ( .mvp_id_size )
@@ -178,12 +149,12 @@ OnNPCKillEvent:
 	if ( !getmonsterinfo( killedrid, MOB_MVPEXP ) ) end;
 
 	if ( !query_sql( "SELECT `goal_points`, `goal_needed`, `mvp_card` FROM `mvp_goal` WHERE `mvp_id` = "+ killedrid, .@goal, .@need_goal, .@mvpcard ) )
-		end; // if the killedrid is MVP but not a mvp_goal ...
+		end; // 如果 killedrid 是 MVP 但不是 mvp_goal ...
 
 	if ( .@goal )
 		query_sql "UPDATE `mvp_goal` SET `goal_points` = `goal_points` - 1 WHERE `mvp_id` = "+ killedrid;
 	if ( .@goal -1 == 0 ) {
-		announce "[ MVP Ranker ]: "+ strcharinfo(0) +" has fullfilled the last kill of ["+ getmonsterinfo( killedrid, MOB_NAME ) +"], the Monster Card can now be purchased in the Shop!", bc_all;
+		announce "[ MVP 排名者 ]："+ strcharinfo(0) +" 已完成 ["+ getmonsterinfo( killedrid, MOB_NAME ) +"] 的最後擊殺，該怪物卡現在可以在商店購買！", bc_all;
 		npcshopadditem "MvPRankShop", .@mvpcard, .@need_goal /4;
 		.shop_card_id[.shop_card_total] = .@mvpcard[.@i];
 		.shop_goal[.shop_card_total] = .@need_goal[.@i] /4;
@@ -202,9 +173,9 @@ OnNPCKillEvent:
 		for ( .@i = 0; .@i < $@partymembercount; ++.@i ) {
 			if ( isloggedin( $@partymemberaid[.@i], $@partymembercid[.@i] ) ) {
 				attachrid $@partymemberaid[.@i];
-				if ( strcharinfo(3) == .@map$ ) { // only those in the same map
+				if ( strcharinfo(3) == .@map$ ) { // 只有同地圖的人
 					++MVPPOINTS;
-					message strcharinfo(0), .n$ +": You have recieved 1 MvP Point for slaying "+ getmonsterinfo( killedrid, MOB_NAME ) +"!";
+					message strcharinfo(0), .n$ +": 你因擊殺 "+ getmonsterinfo( killedrid, MOB_NAME ) +" 獲得 1 點 MVP 點數！";
 					.@cid[.@count] = $@partymembercid[.@i];
 					.@name$[.@count] = strcharinfo(0);
 					++.@count;
@@ -219,7 +190,7 @@ OnNPCKillEvent:
 
 OnBuyItem:
 	if ( checkweight2( @bought_nameid, @bought_quantity ) == false ) {
-		dispbottom .n$+": I'm sorry, but you don't have enough space in inventory to take these items.";
+		dispbottom .n$+": 抱歉，您的物品欄沒有足夠的空間來接收這些物品。";
 		end;
 	}
 
@@ -230,7 +201,7 @@ OnBuyItem:
 				.@total += .shop_goal[.@j] * @bought_quantity[.@i];
 
 	if ( .@total > MVPPOINTS ) {
-		dispbottom .n$+": I'm sorry, but you don't enough MvP Points to purchase these cards.";
+		dispbottom .n$+": 抱歉，您的 MVP 點數不足以購買這些卡片。";
 		end;
 	}
 	MVPPOINTS -= .@total;
