@@ -1,220 +1,219 @@
 //===== rAthena Script =======================================
-//= Vote NPC
+//= 投票 NPC					GPT翻譯=======
 //===== By ===================================================
 //= llchrisll
 //===== Version ==============================================
-//= 1.0 - Initial Version
-//= 1.1 - Added missing check for Vote Limit
-//= 1.2 - Script Optimization
-//      - Changed the way the GM Menu appears
+//= 1.0 - 初始版本
+//= 1.1 - 新增缺少的投票限制檢查
+//= 1.2 - 腳本優化
+//      - 更改 GM 選單顯示方式
 //===== Tested With =========================================
 //= rAthena SQL 07/16-2017 Revision
 //===== Description ==========================================
-//= This script can create/delete/reset votes.
-//  Config has been made as dynamically as possible.
-//	Delay, Max Answers, Max Votes at once, Max letters per Vote,
-//	Max letters per Answers can be set too.
-//	See 'OnInit'.
+//= 此腳本可創建/刪除/重置投票。
+//  配置盡可能動態化。
+//  可設定延遲、最大答案數、同時最大投票數、投票最大字數、
+//  答案最大字數等。參見 'OnInit'。
 //===== Comments =============================================
-//= Request (http://rathena.org/board/topic/57438-request-vote-npc/)
-//	by PapaZola (http://rathena.org/board/user/682-papazola/)
+//= 請求 (http://rathena.org/board/topic/57438-request-vote-npc/)
+//  by PapaZola (http://rathena.org/board/user/682-papazola/)
 //============================================================
 prontera,150,180,4	script	Vote NPC	100,{
 
 mes .n$;
-mes "Hello, "+strcharinfo(0)+".";
+mes "你好，"+strcharinfo(0)+"。";
 if(getgmlevel() >= .gm) 
-	if(select("- GM Menu:- Player Menu") == 1) goto GM_Menu;
-	
+    if(select("- GM 選單:- 玩家選單") == 1) goto GM_Menu;
+
 if(getarraysize($vote_q$) < 1) {
-	mes "I'm sorry, there is nothing to vote for yet.";
-	close;
+    mes "抱歉，目前還沒有可投票的項目。";
+    close;
 }
 if(gettimetick(2) < #vote_del) {
-	mes "You can't vote again, please wait until the delay is over.";
-	close;
-	
+    mes "你還不能再次投票，請等待延遲結束。";
+    close;
+    
 } else if(.vote_limit == 1 && #vote_l == 1) {
-	mes "I'm sorry, but you voted already.";
-	close;
+    mes "抱歉，你已經投過票了。";
+    close;
 }
-mes "Please select which vote you want to participate in:";
-mes "^FF0000Note: Vote Delay " + ( (.vote_delay/60 >= 60)?.vote_delay/3600+" hours.":.vote_delay/60+" minutes");
-mes ( (.vote_limit == 1)?"You can only vote once per vote.^000000":"You can vote more than once after the delay has passed.^000000");
+mes "請選擇要參與的投票項目：";
+mes "^FF0000注意：投票延遲 "+ ( (.vote_delay/60 >= 60)?.vote_delay/3600+" 小時。":.vote_delay/60+" 分鐘");
+mes ( (.vote_limit == 1)?"你每個投票只能投一次。^000000":"你可以在延遲結束後投多次。^000000");
 for ( set .@l,0; .@l < getarraysize($vote_q$); set .@l,.@l + 1)
-	set .@v_menu$,.@v_menu$ + "- "+$vote_q$[.@l] + ( ($vote_q$[.@l+1] != "")?":":"");
+    set .@v_menu$,.@v_menu$ + "- "+$vote_q$[.@l] + ( ($vote_q$[.@l+1] != "")?":":"");
 
 next;
 set .@v,select(.@v_menu$) - 1;
 
 mes .n$;
 for ( set .@a,1; .@a < getd("$vote_q"+.@v+"_at"); set .@a,.@a + 1) 
-	set .@a_menu$,.@a_menu$ + "- "+getd("$vote_q"+.@v+"_a"+.@a+"$") + ( (getd("$vote_q"+.@v+"_a"+(.@a+1)+"$") != "")?":":"");
+    set .@a_menu$,.@a_menu$ + "- "+getd("$vote_q"+.@v+"_a"+.@a+"$") + ( (getd("$vote_q"+.@v+"_a"+(.@a+1)+"$") != "")?":":"");
 
 mes $vote_q$[.@v];
 next;
 set .@a,select(.@a_menu$);
 mes .n$;
-mes "Thank you for participating in this vote.";
-mes "I appreciate it.";
+mes "感謝你參與此次投票。";
+mes "我很感激。";
 setd("$vote_q"+.@d+"_v"+.@a),getd("$vote_q"+.@d+"_v"+.@a) + 1;
 if(.vote_limit == 0) 
-	set #vote_del,gettimetick(2) + .vote_delay;
+    set #vote_del,gettimetick(2) + .vote_delay;
 else
-	set #vote_l,1;
+    set #vote_l,1;
 close;
-	
+    
 GM_Menu:
-mes "How may I help you today?";
+mes "你今天需要什麼幫助？";
 mes " ";
-if(getarraysize($vote_q$) < 1) mes "Currently there are no Votes running.";
+if(getarraysize($vote_q$) < 1) mes "目前沒有進行中的投票。";
 else {
-	mes "Currently there are the following Votes running:";
-	mes "====================";
-	for ( set .@q,0; .@q < getarraysize($vote_q$); set .@q,.@q + 1) {
-		mes (.@q + 1) + ". "+$vote_q$[.@q];
-		mes ( ($vote_q$[.@q+1] != "")?"---------------------":"====================");
-	}
+    mes "目前有以下進行中的投票：";
+    mes "====================";
+    for ( set .@q,0; .@q < getarraysize($vote_q$); set .@q,.@q + 1) {
+        mes (.@q + 1) + ". "+$vote_q$[.@q];
+        mes ( ($vote_q$[.@q+1] != "")?"---------------------":"====================");
+    }
 }
 next;
-switch(select("- View Vote Results:- Add Vote:- Delete Vote:- Reset Vote:- Delete All Votes:- Nevermind")) {
+switch(select("- 查看投票結果:- 新增投票:- 刪除投票:- 重置投票:- 刪除所有投票:- 算了")) {
 
-	case 1:
-	mes .n$;
-	mes "Here are the current Vote Results!";
-	next;
-	mes "====================";
-	for(set .@d,0; .@d < getarraysize($vote_q$); set .@d,.@d + 1) {
-		mes $vote_q$[.@d]+":";
-		set .@a,1;
-		while( .@a < getd("$vote_q"+.@d+"_at")) {
-			mes getd("$vote_q"+.@d+"_a"+.@a+"$")+": "+getd("$vote_q"+.@d+"_v"+.@a);
-			set .@a,.@a + 1;
-		}
-		mes ( ($vote_q$[.@d+1] != "")?"---------------------":"====================");
-	}
-	break;
+    case 1:
+    mes .n$;
+    mes "以下是當前的投票結果！";
+    next;
+    mes "====================";
+    for(set .@d,0; .@d < getarraysize($vote_q$); set .@d,.@d + 1) {
+        mes $vote_q$[.@d]+":";
+        set .@a,1;
+        while( .@a < getd("$vote_q"+.@d+"_at")) {
+            mes getd("$vote_q"+.@d+"_a"+.@a+"$")+": "+getd("$vote_q"+.@d+"_v"+.@a);
+            set .@a,.@a + 1;
+        }
+        mes ( ($vote_q$[.@d+1] != "")?"---------------------":"====================");
+    }
+    break;
 
-	case 2:
-	mes .n$;
-	if(getarraysize($vote_q$) == .votes) {
-		mes "I'm sorry, but the maxium of votes you can create has been reached.";
-		mes "Please delete one first before creating a new one.";
-		close;
-	}
-	mes "Please state the question for the Vote please.";
-	mes "Maximum is "+.vote_q_max+" letters.";
-	next;
-	if(input(.@v_name$,1,.vote_q_max) != 0) {
-		mes .n$;
-		mes "The question you have put is too long.";
-		mes "Please choose a shorter one.";
-		close;
-	}
+    case 2:
+    mes .n$;
+    if(getarraysize($vote_q$) == .votes) {
+        mes "抱歉，已達到可創建的最大投票數。";
+        mes "請先刪除一個再創建新的。";
+        close;
+    }
+    mes "請提出投票問題：";
+    mes "最大字數為 "+.vote_q_max+" 字。";
+    next;
+    if(input(.@v_name$,1,.vote_q_max) != 0) {
+        mes .n$;
+        mes "你提出的問題太長了。";
+        mes "請選擇一個較短的問題。";
+        close;
+    }
 
-	set @a,1;
-	while( @a <= .vote_a) {
-		mes .n$;
-		mes "Possible Answer #"+@a+"/"+.vote_a+":";
-		mes "Maximum "+.vote_a_max+" letters.";
-		next;
-		if(input(getd(".@v_a"+@a+"$"),1,.vote_a_max) != 0) {
-			mes .n$;
-			mes "Error: Maximum "+.vote_a_max+" letters.";
-			next;
-			continue;
-		}
-		if(getd(".@v_a"+@a+"$") != "") {
-			setd("$vote_q"+getarraysize($vote_q$)+"_a"+@a+"$"),getd(".@v_a"+@a+"$");
-			set @a,@a + 1;
-		}
-	}
-	setd("$vote_q"+getarraysize($vote_q$)+"_at"),@a; // Total Answers of the vote
-	setarray $vote_q$[getarraysize($vote_q$)],.@v_name$;
-	mes .n$;
-	mes "New Vote \""+.@v_name$+"\" has been created.";
-	break;
-	
-	case 3:
-	mes .n$;
-	mes "Please select which vote you want to delete:";
-	for ( set .@l,0; .@l < getarraysize($vote_q$); set .@l,.@l + 1)
-		set .@v_menu$,.@v_menu$ + "- "+$vote_q$[.@l] + ( ($vote_q$[.@l+1] != "")?":":"");
-		
-	next;
-	set .@v,select(.@v_menu$) - 1;
-	
-	mes .n$;
-	mes "Chosen Vote: \""+$vote_q$[.@v]+"\"";
-	mes "Correct?";
-	if(select("- Yes:- No") - 1) close;
-	next;
-	mes .n$;
-	mes "I will now delete this vote.";
-	close2;
-	set .@a,1;
-	while( .@a != getd("$vote_q"+.@v+"_at")) {
-		setd("$vote_q"+.@v+"_a"+.@a+"$"),"";
-		setd("$vote_q"+.@v+"_v"+.@a),0;
-		set .@a,.@a + 1;
-	}
-	setd("$vote_q"+.@v+"_at"),0;
-	deletearray $vote_q$[.@v],1;
-	break;
-	
-	case 4:
-	mes .n$;
-	mes "Please select which vote you want to reset:";
-	for ( set .@l,0; .@l < getarraysize($vote_q$); set .@l,.@l + 1)
-		set .@v_menu$,.@v_menu$ + "- "+$vote_q$[.@l] + ( ($vote_q$[.@l+1] != "")?":":"");
-		
-	next;
-	set .@v,select(.@v_menu$) - 1;
-	
-	mes .n$;
-	mes "Chosen Vote: \""+$vote_q$[.@v]+"\"";
-	mes "Correct?";
-	if(select("- Yes:- No") - 1) close;
-	next;
-	mes .n$;
-	mes "I will now reset this vote.";
-	close2;
-	set .@a,1;
-	while( .@a != getd("$vote_q"+.@v+"_at")) {
-		setd("$vote_q"+.@v+"_v"+.@a),0;
-		set .@a,.@a + 1;
-	}
-	break;
-	
-	case 5:
-	mes .n$;
-	mes "Do you really delete every vote?";
-	if(select("- Yes:- No") - 1) close;
-	for(set .@d,0; .@d < getarraysize($vote_q$); set .@d,.@d + 1) {
-		set .@a,1;
-		while( .@a != getd("$vote_q"+.@d+"_at")) {
-			setd("$vote_q"+.@d+"_a"+.@a+"$"),"";
-			setd("$vote_q"+.@d+"_v"+.@a),0;
-			set .@a,.@a + 1;
-		}
-		setd("$vote_q"+.@d+"_at"),0;
-	}
-	deletearray $vote_q$[0],getarraysize($vote_q$);
-	break;
-	
-	case 7:
-	break;
+    set @a,1;
+    while( @a <= .vote_a) {
+        mes .n$;
+        mes "可能的答案 #"+@a+"/"+.vote_a+"：";
+        mes "最大 "+.vote_a_max+" 字。";
+        next;
+        if(input(getd(".@v_a"+@a+"$"),1,.vote_a_max) != 0) {
+            mes .n$;
+            mes "錯誤：最大 "+.vote_a_max+" 字。";
+            next;
+            continue;
+        }
+        if(getd(".@v_a"+@a+"$") != "") {
+            setd("$vote_q"+getarraysize($vote_q$)+"_a"+@a+"$"),getd(".@v_a"+@a+"$");
+            set @a,@a + 1;
+        }
+    }
+    setd("$vote_q"+getarraysize($vote_q$)+"_at"),@a; // 投票的總答案數
+    setarray $vote_q$[getarraysize($vote_q$)],.@v_name$;
+    mes .n$;
+    mes "新的投票 \""+.@v_name$+"\" 已創建。";
+    break;
+    
+    case 3:
+    mes .n$;
+    mes "請選擇要刪除的投票：";
+    for ( set .@l,0; .@l < getarraysize($vote_q$); set .@l,.@l + 1)
+        set .@v_menu$,.@v_menu$ + "- "+$vote_q$[.@l] + ( ($vote_q$[.@l+1] != "")?":":"");
+        
+    next;
+    set .@v,select(.@v_menu$) - 1;
+    
+    mes .n$;
+    mes "選擇的投票： \""+$vote_q$[.@v]+"\"";
+    mes "正確嗎？";
+    if(select("- 是:- 否") - 1) close;
+    next;
+    mes .n$;
+    mes "我現在將刪除此投票。";
+    close2;
+    set .@a,1;
+    while( .@a != getd("$vote_q"+.@v+"_at")) {
+        setd("$vote_q"+.@v+"_a"+.@a+"$"),"";
+        setd("$vote_q"+.@v+"_v"+.@a),0;
+        set .@a,.@a + 1;
+    }
+    setd("$vote_q"+.@v+"_at"),0;
+    deletearray $vote_q$[.@v],1;
+    break;
+    
+    case 4:
+    mes .n$;
+    mes "請選擇要重置的投票：";
+    for ( set .@l,0; .@l < getarraysize($vote_q$); set .@l,.@l + 1)
+        set .@v_menu$,.@v_menu$ + "- "+$vote_q$[.@l] + ( ($vote_q$[.@l+1] != "")?":":"");
+        
+    next;
+    set .@v,select(.@v_menu$) - 1;
+    
+    mes .n$;
+    mes "選擇的投票： \""+$vote_q$[.@v]+"\"";
+    mes "正確嗎？";
+    if(select("- 是:- 否") - 1) close;
+    next;
+    mes .n$;
+    mes "我現在將重置此投票。";
+    close2;
+    set .@a,1;
+    while( .@a != getd("$vote_q"+.@v+"_at")) {
+        setd("$vote_q"+.@v+"_v"+.@a),0;
+        set .@a,.@a + 1;
+    }
+    break;
+    
+    case 5:
+    mes .n$;
+    mes "你確定要刪除所有投票嗎？";
+    if(select("- 是:- 否") - 1) close;
+    for(set .@d,0; .@d < getarraysize($vote_q$); set .@d,.@d + 1) {
+        set .@a,1;
+        while( .@a != getd("$vote_q"+.@d+"_at")) {
+            setd("$vote_q"+.@d+"_a"+.@a+"$"),"";
+            setd("$vote_q"+.@d+"_v"+.@a),0;
+            set .@a,.@a + 1;
+        }
+        setd("$vote_q"+.@d+"_at"),0;
+    }
+    deletearray $vote_q$[0],getarraysize($vote_q$);
+    break;
+    
+    case 7:
+    break;
 }
 end;
 
 OnInit:
 set .n$,"["+strnpcinfo(1)+"]";
-set .votes,3; // Max Votes at the same time
-set .vote_q_max,15; // Maxium letters for the question
-set .vote_a,2; // Max Answers possible
-set .vote_a_max,5; // Maxium letters for the answers
-set .vote_delay,86400; // Delay in seconds, default 1 day (86400 Seconds)
-set .vote_limit,1; // Each player can only vote once per Vote: 1 = On / 0 = Off
-set .gm,60; // GM Access Level
+set .votes,3; // 同時最大投票數
+set .vote_q_max,15; // 問題最大字數
+set .vote_a,2; // 最大答案數
+set .vote_a_max,5; // 答案最大字數
+set .vote_delay,86400; // 延遲時間（秒），默認為 1 天（86400 秒）
+set .vote_limit,1; // 每個玩家每個投票只能投一次：1 = 開啟 / 0 = 關閉
+set .gm,60; // GM 存取等級
 end;
 }
